@@ -271,7 +271,7 @@ def lidar_timestamps(base_dir, seq):
     seq: sequence name
     """
     lidar_files = glob.glob(str(Path(base_dir).joinpath(seq).joinpath("ouster").joinpath("*")))
-    lidar_files = [file.replace(".bin", "") for file in lidar_files]
+    lidar_files = [file.replace(".bin", "").split("/")[-1] for file in lidar_files]
     lidar_timestamps = np.array(lidar_files, int)
     lidar_timestamps.sort()
     return lidar_timestamps
@@ -279,12 +279,21 @@ def lidar_timestamps(base_dir, seq):
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
-    base_dir = "/media/aaron/OKULAr_HDD/odyssey_ecmr"
+    base_dir = "/media/aaron/OKULAr_HDD/odyssey_ecmr/"
     seq = "Feldweg1"
 
     # Loads ground truth poses, timesynced with lidar frames
     gt_poses = get_ground_truth_poses_timesynced_with_lidar(base_dir, seq, "interpolate", True, True)
     plt.plot(gt_poses[:, 0, -1], gt_poses[:, 1, -1], label="refsys")
+    plt.axis("equal")
+    plt.show()
+
+    l_timestamps = lidar_timestamps(base_dir,seq)
+
+    point_cloud = load_pointcloud(base_dir,seq,l_timestamps[0],False)
+
+    plt.scatter(point_cloud[:,0],point_cloud[:,1],c="C0",s=1)
+    plt.axis("equal")
     plt.show()
 
     # Loads the IMU data from the M300 system
