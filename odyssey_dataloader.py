@@ -59,7 +59,7 @@ def load_pointcloud(base_dir, seq, timestamp, preserve_2D_order=False):
     the data stored in the file
     """
     pc = np.fromfile(Path(base_dir).joinpath(seq).joinpath("ouster").joinpath(f"{timestamp}.bin"), np.float32).reshape(
-        (-1, 5))
+        (-1, 6))
     if preserve_2D_order:
         pc = pc.reshape((128, -1, pc.shape[-1]))
     return pc
