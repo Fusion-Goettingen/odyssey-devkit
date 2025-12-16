@@ -1,8 +1,10 @@
 # Odyssey Devkit
 
 Odyssey is a dataset taylored towards lidar-inertial-odometry (LIO). This repository contains all accompanying code, including the Python dataloader as well as examples for its usage.
+
 Download the dataset from our homepage [https://odyssey.uni-goettingen.de/](https://odyssey.uni-goettingen.de/)
-Read our paper at:[TODO](TODO)
+
+Read our paper preprint on [arXiv](TODO)
 
 # Python Dependencies
 - Numpy
