@@ -4,7 +4,6 @@ from odyssey_dataloader import *
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     base_dir = "/path/to/odyssey_base_dir/"
-    base_dir = "/media/aaron/dataset-ssd/datasets/odyssey"
     seq = "UndergroundCarPark1"
 
     """
