@@ -58,7 +58,7 @@ def load_pointcloud(base_dir, seq, timestamp, preserve_2D_order=False):
 
 def load_lidar_timestamps(base_dir, seq):
     lidar_files = glob.glob(str(Path(base_dir).joinpath(seq).joinpath("ouster").joinpath("*")))
-    lidar_files = [file.split("/")[-1].replace(".bin", "") for file in lidar_files]
+    lidar_files = [Path(e).stem for e in lidar_files]
     lidar_timestamps = np.array(lidar_files, int)
     lidar_timestamps.sort()
     return lidar_timestamps
