@@ -117,16 +117,29 @@ def combine_navsatfix_and_imu_at_times(timestamps, navsatfix, imu, match_mode="c
                                        normalize_orientation=True):
     assert match_mode == "closest" or match_mode == "interpolate"
 
-    def closest_searchsorted(a,v):
-        ii_right = np.searchsorted(a,v)
-        ii_left = ii_right - 1
-        ii_left = np.clip(ii_left,0,len(a))
-        dt_left = np.abs(v - a[ii_left])
-        dt_right = np.abs(v - a[ii_right])
-        ii = np.full(ii_left.shape,-1,int)
-        ii[dt_left < dt_right] = ii_left[dt_left < dt_right]
-        ii[dt_right < dt_left] = ii_right[dt_right < dt_left]
-        return ii
+    def closest_searchsorted(a, v):
+        """
+        Searches for the index where a is closest to v (for all v if v is a list). Assumes that a is sorted in ascending order.
+        Parameters
+        ----------
+        a: the array where v is searched for in.
+        v: the value (or array) that is searched for
+
+        Returns
+        -------
+        the index where a is closest to v
+        """
+        N = len(a) - 1
+        idx = np.searchsorted(a, v, side="right")
+        d_l = np.full(idx.shape[0], 10000000000000000)  # TODO: replace with proper int max value
+        d_r = np.full(idx.shape[0], 10000000000000000)  # TODO: replace with proper int max value
+        d_l[idx > 0] = np.abs(a[idx[idx > 0] - 1] - v[idx > 0])
+        d_r[idx < N] = np.abs(a[idx[idx < N] + 1] - v[idx < N])
+        d = np.zeros(idx.shape, int)
+        d[d_l < d_r] = -1
+        d[d_l > d_r] = 1
+        id = idx + d
+        return id
     
     def interpolate(key_times, key_value, times):
         N = len(key_times) - 1
