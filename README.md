@@ -11,7 +11,7 @@ Odyssey is a automotive dataset taylored towards localization tasks such as lida
   </font>
 </p>
 
-# ⚠ Our dataset has been updated on the 12.06.2026. Please visit our homepage and download the newest data ⚠
+# ⚠ Our data has been updated ⚠
 We have updated our dataset, paper and dataloader. All downloaded data before the 12.06.2026 is outdated. Please visit our [homepage](https://odyssey.uni-goettingen.de/) and download our new data.
 
 # Python Dependencies
