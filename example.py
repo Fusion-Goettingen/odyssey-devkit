@@ -4,29 +4,18 @@ from odyssey_dataloader import *
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     base_dir = "/path/to/odyssey_base_dir/"
-    seq = "UndergroundCarPark1"
+    seq = "ParkingGarage1"
 
     """
     ****************************************
     *  SECTION: Loading Ground Truth Poses *
     ****************************************
     """
-    # Loading the full list of ground truth poses, as cartesian and first pose set to identity
-    timestamps, gt_poses_full = load_refsys_poses(base_dir,seq,True,True)
-    plt.plot(gt_poses_full[:,0,-1],gt_poses_full[:,1,-1], c="C0")
 
-    # Loading lidar poses from lidar_poses.txt file
-    lidar_timestamps, lidar_poses = load_lidar_poses(base_dir,seq)
-    plt.plot(lidar_poses[:,0,-1],lidar_poses[:,1,-1], c="C1")
-
-    # Loading from file is just a convenience function. The same can be achieved using the following code
-    lidar_timestamps = load_lidar_timestamps(base_dir,seq)
-    lidar_timestamps_2, lidar_poses_2 = load_refsys_poses_at_times(base_dir,seq,lidar_timestamps,match_mode="closest",to_cartesian=True, normalize_orientation=True)
-
-    assert np.all(lidar_timestamps == lidar_timestamps_2)
-    assert np.all(np.isclose(lidar_poses,lidar_poses_2))
-
-    plt.plot(lidar_poses_2[:,0,-1],lidar_poses_2[:,1,-1], c="C2")
+    # Loading ground truth poses from refsys/ground_truth_poses.txt (10Hz). Use this for evaluation.
+    # This data is derived from the reference system as described in the paper.
+    timestamps, gt_poses = load_ground_truth_poses(base_dir,seq)
+    plt.plot(gt_poses[:,0,-1],gt_poses[:,1,-1], c="C1")
     plt.show()
 
     """
@@ -42,13 +31,14 @@ if __name__ == "__main__":
     plt.show()
 
     # Preserving the 2D structure of the pointcloud lets you interpret the lidar data as an image.
+    # In this case we are showing the reflectivity.
     lidar_timestamps = load_lidar_timestamps(base_dir, seq)
     pointcloud = load_pointcloud(base_dir,seq,lidar_timestamps[0], True)
     #range_image = np.linalg.norm(pointcloud[:,:,:3],axis=-1)
     plt.imshow(pointcloud[:,:,4])
     plt.show()
 
-    # Pointcloud generator to iterate through all pointcloud of a sequence.
+    # You can also use a pointcloud generator to iterate through all pointcloud of a sequence.
     pc_gen = pointcloud_generator(base_dir,seq)
     for timestamp, pointcloud in pc_gen:
         #plt.scatter(pointcloud[:,0],pointcloud[:,1],s=2,c=pointcloud[:,4])
@@ -75,12 +65,3 @@ if __name__ == "__main__":
     plt.plot(imu_data[:,0], linacc[:,2],c="C2",label="z")
     plt.legend()
     plt.show()
-
-
-
-
-
-
-
-
-

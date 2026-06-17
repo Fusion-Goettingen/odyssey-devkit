@@ -56,12 +56,9 @@ def load_pointcloud(base_dir, seq, timestamp, preserve_2D_order=False):
         pc = pc.reshape((128, -1, pc.shape[-1]))
     return pc
 
-def load_lidar_timestamps(base_dir, seq):
-    lidar_files = glob.glob(str(Path(base_dir).joinpath(seq).joinpath("ouster").joinpath("*")))
-    lidar_files = [Path(e).stem for e in lidar_files]
-    lidar_timestamps = np.array(lidar_files, int)
-    lidar_timestamps.sort()
-    return lidar_timestamps
+def load_lidar_timestamps(base_dir,seq):
+    timestamps = np.genfromtxt(str(Path(base_dir).joinpath(seq).joinpath("metadata").joinpath("lidar_timestamps.txt")),dtype=int)
+    return timestamps
 
 def pointcloud_generator(base_dir,seq,preserve_2D_order=False):
     timestamps = load_lidar_timestamps(base_dir,seq)
@@ -76,6 +73,7 @@ def load_refsys_navsatfix(base_dir, seq, as_structured=False):
 
 def load_refsys_imu(base_dir, seq, as_structured=False):
     return load_data(base_dir, seq, "refsys", "imu.txt", dtype_imu, as_structured)
+
 
 def load_m300_imu(base_dir, seq, as_structured=False):
     return load_data(base_dir, seq, "m300", "imu.txt", dtype_imu, as_structured)
@@ -112,53 +110,33 @@ def llas_to_cart(llas, origin=None):
     return ts
 
 
+def closest_searchsorted(a, v):
+    ii_right = np.searchsorted(a,v)
+    ii_right = np.clip(ii_right,0,len(a)-1)
+    ii_left = ii_right - 1
+    ii_left = np.clip(ii_left,0,len(a)-1)
+    dt_left = np.abs(v - a[ii_left])
+    dt_right = np.abs(v - a[ii_right])
+    ii = np.full(ii_left.shape,-1,int)
+    ii[dt_left <= dt_right] = ii_left[dt_left <= dt_right]
+    ii[dt_right < dt_left] = ii_right[dt_right < dt_left]
+    import matplotlib.pyplot as plt
+    return ii
 
-def combine_navsatfix_and_imu_at_times(timestamps, navsatfix, imu, match_mode="closest", to_cartesian=True,
-                                       normalize_orientation=True):
+def interpolate(key_times, key_value, times):
+    if key_value.ndim == 1:
+        return np.interp(times,key_times,key_value)
+    elif key_value.ndim == 2:
+        res = np.zeros((len(times), key_value.shape[1]),dtype=key_value.dtype)
+        for i in range(key_value.shape[1]):
+            res[:,i] = interpolate(key_times,key_value[:,i],times)
+        return res
+    else:
+        raise ValueError("key_value with ndim > 2 not supported")
+
+
+def combine_navsatfix_and_imu_at_times(timestamps, navsatfix, imu, match_mode="closest", to_cartesian=True, normalize_orientation=True):
     assert match_mode == "closest" or match_mode == "interpolate"
-
-    def closest_searchsorted(a, v):
-        """
-        Searches for the index where a is closest to v (for all v if v is a list). Assumes that a is sorted in ascending order.
-        Parameters
-        ----------
-        a: the array where v is searched for in.
-        v: the value (or array) that is searched for
-
-        Returns
-        -------
-        the index where a is closest to v
-        """
-        N = len(a) - 1
-        idx = np.searchsorted(a, v, side="right")
-        d_l = np.full(idx.shape[0], 10000000000000000)  # TODO: replace with proper int max value
-        d_r = np.full(idx.shape[0], 10000000000000000)  # TODO: replace with proper int max value
-        d_l[idx > 0] = np.abs(a[idx[idx > 0] - 1] - v[idx > 0])
-        d_r[idx < N] = np.abs(a[idx[idx < N] + 1] - v[idx < N])
-        d = np.zeros(idx.shape, int)
-        d[d_l < d_r] = -1
-        d[d_l > d_r] = 1
-        id = idx + d
-        return id
-    
-    def interpolate(key_times, key_value, times):
-        N = len(key_times) - 1
-        idx = np.searchsorted(key_times, times)
-
-        l = idx - 1 
-        r = idx 
-        l[l < 0] = 0
-        r[r >= key_times.shape[0]] = key_times.shape[0] - 1
-
-        l_val = key_times[l]
-        r_val = key_times[r]
-        time_diff = (r_val - l_val)
-        time_diff[time_diff == 0] = float("inf")
-        t = (times - l_val) / time_diff
-
-        return key_value[l] * (1 - t[:, np.newaxis]) + key_value[r] * t[:, np.newaxis]
-
-
 
     navsatfix_timestamps = navsatfix[:, 0]
     navsatfix_data = navsatfix[:, 1:4]
@@ -188,25 +166,20 @@ def combine_navsatfix_and_imu_at_times(timestamps, navsatfix, imu, match_mode="c
     poses[:, -1, -1] = 1
     return poses
 
-
-def load_refsys_poses(base_dir, seq, to_cartesian=True, normalize_orientation=True):
+def load_refsys_poses(base_dir, seq, timestamps=None, match_mode="closest", to_cartesian=True, normalize_orientation=True):
     navsatfix = load_refsys_navsatfix(base_dir, seq)
     imu = load_refsys_imu(base_dir, seq)
-    gt_poses = combine_navsatfix_and_imu_at_times(imu[:,0], navsatfix, imu, "closest", to_cartesian,
-                                                    normalize_orientation)
-    return imu[:,0], gt_poses
+    if timestamps is None:
+        gt_poses = combine_navsatfix_and_imu_at_times(imu[:,0], navsatfix, imu, match_mode, to_cartesian, normalize_orientation)
+        return imu[:,0], gt_poses
+    else:
+        gt_poses = combine_navsatfix_and_imu_at_times(timestamps, navsatfix, imu, match_mode, to_cartesian, normalize_orientation)
+        return timestamps, gt_poses
 
-def load_refsys_poses_at_times(base_dir, seq, timestamps, match_mode="closest", to_cartesian=True, normalize_orientation=True):
-    navsatfix = load_refsys_navsatfix(base_dir, seq)
-    imu = load_refsys_imu(base_dir, seq)
-    gt_poses = combine_navsatfix_and_imu_at_times(timestamps, navsatfix, imu, match_mode, to_cartesian, normalize_orientation)
-    return timestamps, gt_poses
-
-def load_lidar_poses(base_dir, seq):
+def load_ground_truth_poses(base_dir, seq):
     lidar_timestamps = load_lidar_timestamps(base_dir,seq)
-    poses_3x4 = np.genfromtxt(Path(base_dir).joinpath(seq).joinpath("refsys").joinpath("lidar_poses.txt"),dtype=float,delimiter=" ").reshape((-1,3,4))
-    poses = np.zeros((len(poses_3x4),4,4),dtype=float)
-    poses[:,:3] = poses_3x4
-    poses[:,-1,-1] = 1
-
-    return lidar_timestamps, poses
+    lidar_poses_3x4 = np.genfromtxt(Path(base_dir).joinpath(seq).joinpath("refsys").joinpath("ground_truth_poses.txt"),delimiter=" ").reshape((-1,3,4))
+    lidar_poses = np.zeros((len(lidar_poses_3x4),4,4))
+    lidar_poses[:,:3] = lidar_poses_3x4
+    lidar_poses[:,-1,-1] = 1
+    return lidar_timestamps, lidar_poses
