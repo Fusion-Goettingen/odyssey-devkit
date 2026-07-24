@@ -1,7 +1,6 @@
 import numpy as np
 from pathlib import Path
 from scipy.spatial.transform import Slerp, Rotation
-import glob
 
 dtype_navsatfix = np.dtype([("t", "i8"), ("lat", "f8"), ("lon", "f8"), ("alt", "f8"),("cov_00", "f8"), ("cov_11", "f8"), ("cov_22", "f8")]) # time, geodetic coodinates in ETRS89/ETRF2024 and diagonal of the covariance 
 
