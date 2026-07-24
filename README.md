@@ -1,9 +1,4 @@
 # Odyssey Devkit
-
-[Titleimage](titleimage.jpg)
-
-Odyssey is a automotive dataset taylored towards localization tasks such as lidar-inertial-odometry (LIO). This repository contains all accompanying code, including the Python dataloader as well as examples for its usage.
-
 <p align="center">
   <font size="12">  
     <a href="https://arxiv.org/abs/2512.14428">[PAPER]</a>
@@ -15,6 +10,11 @@ Odyssey is a automotive dataset taylored towards localization tasks such as lida
 
 # ⚠ Our data has been updated ⚠
 We have updated our dataset, paper and dataloader. All downloaded data before the 12.06.2026 is outdated. Please visit our [homepage](https://odyssey.uni-goettingen.de/) and download our new data.
+
+
+![Titleimage](titleimage.jpg)
+Odyssey is an automotive dataset taylored towards localization tasks such as lidar-inertial-odometry (LIO). This repository contains all accompanying code, including the Python dataloader as well as examples for its usage.
+
 
 # Python Dependencies
 - Numpy
