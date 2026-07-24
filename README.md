@@ -19,7 +19,7 @@ Odyssey is an automotive dataset taylored towards localization tasks such as lid
 # Python Dependencies
 - Numpy
 - Scipy
-- Matplotlib
+- Matplotlib (for the example code only)
 
 # Quickstart
 Clone this repo with
