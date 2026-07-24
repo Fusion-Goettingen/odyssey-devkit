@@ -120,7 +120,6 @@ def closest_searchsorted(a, v):
     ii = np.full(ii_left.shape,-1,int)
     ii[dt_left <= dt_right] = ii_left[dt_left <= dt_right]
     ii[dt_right < dt_left] = ii_right[dt_right < dt_left]
-    import matplotlib.pyplot as plt
     return ii
 
 def interpolate(key_times, key_value, times):
