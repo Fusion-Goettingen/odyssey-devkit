@@ -9,7 +9,6 @@
     <a href="https://github.com/Fusion-Goettingen/odyssey-devkit#pencil-citation">Citation</a>
     <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
     <a href="https://github.com/Fusion-Goettingen/odyssey-devkit#mailbox-contact">Contact</a>
-
   <br />
   <br />
 </p>
