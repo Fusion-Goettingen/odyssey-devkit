@@ -13,7 +13,7 @@
 </div>
 
 ![Titleimage](titleimage.jpg)
-Odyssey is an automotive dataset designed for LiDAR and LiDAR-inertial odometry, as well as other localization tasks such as place recognition. This repository contains the accompanying code, including a Python data loader and examples demonstrating its use.
+**Odyssey** is an automotive dataset designed for **LiDAR** and **LiDAR-inertial odometry**, as well as other localization tasks such as **place recognition**. This repository contains the accompanying code, including a Python data loader and examples demonstrating its use.
 
 ## :confetti_ball: Odyssey accepted at IJRR :confetti_ball:
 We are happy to announce that **Odyssey** has been accepted for publication in *The International Journal of Robotics Research (IJRR)*.
