@@ -56,7 +56,7 @@ def load_pointcloud(base_dir, seq, timestamp, preserve_2D_order=False):
     return pc
 
 def load_lidar_timestamps(base_dir,seq):
-    timestamps = np.genfromtxt(str(Path(base_dir).joinpath(seq).joinpath("metadata").joinpath("lidar_timestamps.txt")),dtype=int)
+    timestamps = np.genfromtxt(str(Path(base_dir).joinpath(seq).joinpath("metadata").joinpath("lidar_timestamps.txt")),dtype=np.int64)
     return timestamps
 
 def pointcloud_generator(base_dir,seq,preserve_2D_order=False):
@@ -176,7 +176,7 @@ def load_refsys_poses(base_dir, seq, timestamps=None, match_mode="closest", to_c
 
 def load_ground_truth_poses(base_dir, seq):
     lidar_timestamps = load_lidar_timestamps(base_dir,seq)
-    lidar_poses_3x4 = np.genfromtxt(Path(base_dir).joinpath(seq).joinpath("refsys").joinpath("ground_truth_poses.txt"),delimiter=" ").reshape((-1,3,4))
+    lidar_poses_3x4 = np.genfromtxt(Path(base_dir).joinpath(seq).joinpath("refsys").joinpath("lidar_poses_ref.txt"),delimiter=" ").reshape((-1,3,4))
     lidar_poses = np.zeros((len(lidar_poses_3x4),4,4))
     lidar_poses[:,:3] = lidar_poses_3x4
     lidar_poses[:,-1,-1] = 1

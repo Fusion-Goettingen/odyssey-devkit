@@ -16,6 +16,7 @@ if __name__ == "__main__":
     # This data is derived from the reference system as described in the paper.
     timestamps, gt_poses = load_ground_truth_poses(base_dir,seq)
     plt.plot(gt_poses[:,0,-1],gt_poses[:,1,-1], c="C1")
+    plt.axis("equal")
     plt.show()
 
     """
