@@ -4,9 +4,12 @@
     <br />
     <a href="https://arxiv.org/abs/2512.14428">Paper</a>
     <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+    <a href="https://odyssey.uni-goettingen.de/download/">Download</a>
+    <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
     <a href="https://github.com/Fusion-Goettingen/odyssey-devkit#pencil-citation">Citation</a>
     <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
     <a href="https://github.com/Fusion-Goettingen/odyssey-devkit#mailbox-contact">Contact</a>
+
   <br />
   <br />
 </p>
